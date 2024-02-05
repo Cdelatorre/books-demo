@@ -1,5 +1,8 @@
 import { useFormik } from 'formik';
 import { object, string } from 'yup';
+import { createBook } from '../services/booksService';
+import { useNavigate } from 'react-router-dom';
+import { ClipLoader } from 'react-spinners';
 
 const bookSchema = object({
   title: string().required('Campo requirido'),
@@ -19,15 +22,29 @@ const INITIAL_VALUES = {
 };
 
 const BookForm = () => {
-  const { values, errors, touched, handleChange, handleBlur, handleSubmit } = useFormik({
+  const navigate = useNavigate();
+  const { values, errors, touched, isValid, isSubmitting, setSubmitting, handleChange, handleBlur, handleSubmit } = useFormik({
     initialValues: INITIAL_VALUES,
     onSubmit: (values) => {
-      console.log({ values });
+      setSubmitting(true)
+
+      createBook(values)
+        .then(createdBook => {
+          navigate(`/books/${createdBook.id}`)
+        })
+        .catch(error => console.error(error))
+        .finally(() => {
+          setSubmitting(false)
+        })
     },
     validationSchema: bookSchema,
-    validateOnChange: false,
+    validateOnChange: true,
     validateOnBlur: true,
+    validateOnMount: true,
   });
+
+  console.log(isSubmitting);
+
 
   return (
     <form onSubmit={handleSubmit} data-bs-theme="light">
@@ -94,14 +111,15 @@ const BookForm = () => {
           name="cover"
           value={values.cover}
           onBlur={handleBlur}
+          autoComplete="off"
         />
         {errors.cover && touched.cover ? (
           <div className="invalid-feedback">{errors.cover}</div>
         ) : null}
       </div>
 
-      <button type="submit" className="btn btn-primary">
-        Create book
+      <button disabled={!isValid || isSubmitting} type="submit" className="btn btn-primary">
+        {isSubmitting ? <><ClipLoader color="#fff" size={12} /> Creando...</> : 'Crear libro'}
       </button>
     </form>
   );
