@@ -1,7 +1,5 @@
 import { useFormik } from 'formik';
 import { object, string } from 'yup';
-import { createBook } from '../services/booksService';
-import { useNavigate } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
 
 const bookSchema = object({
@@ -21,20 +19,20 @@ const INITIAL_VALUES = {
   genres: [],
 };
 
-const BookForm = () => {
-  const navigate = useNavigate();
-  const { values, errors, touched, isValid, isSubmitting, setSubmitting, handleChange, handleBlur, handleSubmit } = useFormik({
-    initialValues: INITIAL_VALUES,
+const BookForm = ({ onSubmit, initialValues = INITIAL_VALUES }) => {
+  const { values, errors, touched, isValid, isSubmitting, setSubmitting, handleChange, handleBlur, handleSubmit, setErrors, setFieldValue } = useFormik({
+    initialValues: {...initialValues, genreText: ''},
     onSubmit: (values) => {
       setSubmitting(true)
 
-      createBook(values)
-        .then(createdBook => {
-          navigate(`/books/${createdBook.id}`)
-        })
-        .catch(error => console.error(error))
-        .finally(() => {
-          setSubmitting(false)
+      const data = {...values}
+      delete data.genreText
+
+      onSubmit(data)
+        .catch(error => {
+          const errors = error.response.data.errors;
+
+          setErrors(errors);
         })
     },
     validationSchema: bookSchema,
@@ -43,14 +41,22 @@ const BookForm = () => {
     validateOnMount: true,
   });
 
-  console.log(isSubmitting);
+  const onClickGenre = () => {
+    if (values.genreText) {
+      setFieldValue('genres', [...values.genres, values.genreText]);
+      setFieldValue('genreText', '');
+    }
+  }
 
+  const onDeleteGenre = (genreToDelete) => {
+    setFieldValue('genres', values.genres.filter(genre => genre !== genreToDelete))
+  }
 
   return (
     <form onSubmit={handleSubmit} data-bs-theme="light">
       <div className="mb-3">
         <label htmlFor="title" className="form-label">
-          Title
+          Título
         </label>
         <input
           className={`form-control ${errors.title && touched.title ? 'is-invalid' : ''}`}
@@ -67,7 +73,7 @@ const BookForm = () => {
 
       <div className="mb-3">
         <label htmlFor="abstract" className="form-label">
-          Abstract
+          Descripción
         </label>
         <textarea
           className={`form-control ${errors.abstract && touched.abstract ? 'is-invalid' : ''}`}
@@ -102,7 +108,7 @@ const BookForm = () => {
 
       <div className="mb-3">
         <label htmlFor="cover" className="form-label">
-          Cover image
+          Imagen
         </label>
         <input
           className={`form-control ${errors.cover && touched.cover ? 'is-invalid' : ''}`}
@@ -111,15 +117,41 @@ const BookForm = () => {
           name="cover"
           value={values.cover}
           onBlur={handleBlur}
-          autoComplete="off"
         />
         {errors.cover && touched.cover ? (
           <div className="invalid-feedback">{errors.cover}</div>
         ) : null}
       </div>
 
+      <div className="mb-3">
+        <label htmlFor="genreText" className="form-label">
+          Géneros
+        </label>
+        <div className="d-flex gap-2">
+          <input
+            className={`form-control ${errors.genres && touched.genres ? 'is-invalid' : ''}`}
+            id="genreText"
+            onChange={handleChange}
+            name="genreText"
+            value={values.genreText}
+            onBlur={handleBlur}
+          />
+          <button type="button" onClick={onClickGenre} className="btn btn-primary flex-shrink-0">Añadir género</button>
+        </div>
+        <div className="mt-3 d-flex gap-2">
+          {values.genres.map(genre => (
+            <div key={genre}>
+              <span className="py-3 px-2 border rounded d-inline-flex align-items-center gap-2">
+                {genre}
+                <button onClick={() => onDeleteGenre(genre)} className="btn btn-outline-danger">X</button>
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <button disabled={!isValid || isSubmitting} type="submit" className="btn btn-primary">
-        {isSubmitting ? <><ClipLoader color="#fff" size={12} /> Creando...</> : 'Crear libro'}
+        {isSubmitting ? <><ClipLoader color="#fff" size={12} /> Creando...</> : 'Enviar'}
       </button>
     </form>
   );

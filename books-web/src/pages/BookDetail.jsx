@@ -5,7 +5,7 @@ import {
   getBookDetail,
   getLatestBooks,
 } from '../services/booksService';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import BookCard from '../components/BookCard';
 
 const BookDetail = () => {
@@ -76,13 +76,18 @@ const BookDetail = () => {
               <h1>{book.title}</h1>
               <p>{book.abstract}</p>
               <p>ISBN: {book.isbn}</p>
-              <button onClick={onDelete} className="btn btn-danger">
-                Borrar libro
-              </button>
+              <div className="d-flex gap-3">
+                <Link to={`/books/${id}/edit`} className="btn btn-success">
+                  Editar libro
+                </Link>
+                <button onClick={onDelete} className="btn btn-danger">
+                  Borrar libro
+                </button>
+              </div>
             </div>
           </div>
 
-          <div>
+          <div className="mt-3">
             <h2>Nuestros últimos libros publicados</h2>
 
             <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">

@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import Books from './pages/Books'
 import BookDetail from './pages/BookDetail'
 import NewBook from './pages/NewBook'
+import EditBook from './pages/EditBook'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/books" element={<Books />} />
           <Route path="/books/:id" element={<BookDetail />} />
           <Route path="/books/new" element={<NewBook />} />
+          <Route path="/books/:id/edit" element={<EditBook />} />
         </Routes>
       </div>
     </div>
