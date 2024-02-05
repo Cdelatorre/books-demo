@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar"
 import Home from './pages/Home'
 import Books from './pages/Books'
 import BookDetail from './pages/BookDetail'
+import NewBook from './pages/NewBook'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/books" element={<Books />} />
           <Route path="/books/:id" element={<BookDetail />} />
+          <Route path="/books/new" element={<NewBook />} />
         </Routes>
       </div>
     </div>

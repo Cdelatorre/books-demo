@@ -15,6 +15,9 @@ const Navbar = () => {
             <NavLink to="/books" className="nav-link">
               Libros
             </NavLink>
+            <NavLink to="/books/new" className="nav-link">
+              Create a book
+            </NavLink>
           </div>
         </div>
       </div>
