@@ -1,8 +1,12 @@
+import { useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { ThemeContext } from "../contexts/ThemeContext";
 
 const Navbar = () => {
+  const { theme, toggleTheme } = useContext(ThemeContext);
+
   return (
-    <nav className="navbar bg-primary navbar-expand-md" data-bs-theme="dark">
+    <nav className={`navbar bg-${theme} navbar-expand-md`} data-bs-theme="dark">
       <div className="container-fluid">
         <Link className="navbar-brand" to="/">
           Books demo
@@ -20,6 +24,9 @@ const Navbar = () => {
             </NavLink>
           </div>
         </div>
+        <button onClick={toggleTheme}>
+          {theme}
+        </button>
       </div>
     </nav>
   )
